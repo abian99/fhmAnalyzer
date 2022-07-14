@@ -1,0 +1,13 @@
+name: fhmAnalyzer
+title: fhmAnalyzer
+username:
+account: aanil43
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 6562984
+bundleId: 6058774
+url: https://aanil43.shinyapps.io/fhmAnalyzer/
+when: 1656615723.11545
+lastSyncTime: 1656615723.11547
+asMultiple: FALSE
+asStatic: FALSE
