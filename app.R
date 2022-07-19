@@ -170,7 +170,6 @@ table_data <- unique(table_data)
 table_data <- merge(table_data,player_ratings, by=c("PlayerId"))
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-
     # Application title
     #utitlePanel("Breaking (Down) The Sim: An analysis of the various ratings and how they affect stats"),
 
@@ -250,17 +249,18 @@ server <- function(input, output) {
       }
       a <- eval(parse(text=paste("table_data$", "`", input$rating, "`", sep = "")))
       data <- eval(parse(text=paste("table_data$", "`", input$stat, "`", sep = "")))
-      reg<-lm(a ~ data)
-      coeff=coefficients(reg)
+      df <- data.frame(x=a,
+                       y = data)
       # equation of the line : 
-      eq = paste0("Correlation of rating and stat = ", round(coeff[2],1), "*x + ", round(coeff[1],1))
-        plot(a, data, main=eq, xlab=input$rating, ylab=input$stat)
-        abline(lm(a ~ data), col = "red")
+      ggplot(df, aes(x=x, y=y)) +
+        geom_point(col='black', size=2) +
+        geom_smooth(method=lm, se=FALSE, col='red', linetype='dashed') +
+        annotate("text",x=4,y=0,label=(paste0("slope==",coef(lm(df$y~df$x))[2])),parse=TRUE, size=5)
     })
     
     output$table <- renderDataTable({
       validate (need(nrow(table_data) > 0, ""))
-      table_data[]
+      table_data[, c(2:3,6:14,17:22)]
     })
 }
 
