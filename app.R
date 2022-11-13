@@ -178,13 +178,14 @@ server <- function(input, output) {
                      y = data)
     # equation of the line :
     ggplot(df, aes(x = x, y = y)) +
-      geom_point(col = 'black', size = 2) +
       geom_smooth(
         method = lm,
         se = FALSE,
         col = 'red',
         linetype = 'dashed'
       ) +
+      geom_jitter(shape=16, position=position_jitter(0.3)) +
+      geom_boxplot(aes(group = x), alpha = 0.65) +
       ggtitle((paste0("slope==", coef(lm(
         df$y ~ df$x
       ))[2])))
@@ -202,6 +203,10 @@ server <- function(input, output) {
     }
     validate (need(nrow(table_data) > 0, ""))
     table_data[, c(2:3, 6:14, 17:22)]
+  })
+  
+  output$ratingstable <- renderDataTable({
+    
   })
 }
 
