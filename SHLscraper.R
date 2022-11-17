@@ -6,6 +6,43 @@ league <- 0
 
 #i believe s60 is when the build scale changed
 seasons <- c(66:67)
+updateValues <- c(1, 1, 2, 3, 4, 6, 8, 13, 18, 30, 42, 67, 97, 137, 187, 242)
+
+buildString = 'Offensive Ratings 
+Screening: 13
+Getting Open: 17
+Passing: 17
+Puckhandling: 17
+Shooting Accuracy: 16
+Shooting Range: 11
+Offensive Read: 18 
+
+Defensive Ratings 
+Checking: 17
+Hitting: 16
+Positioning: 15
+Stickchecking: 15
+Shot Blocking: 11
+Faceoffs: 5
+Defensive Read: 18
+
+Physical Ratings 
+Acceleration: 15
+Agility: 11
+Balance: 17
+Speed: 15
+Stamina: 17
+Strength: 17
+Fighting: 5
+
+Mental Ratings 
+Aggression: 5
+Bravery: 10
+*Determination: 15 
+*Team Player: 15 
+*Leadership: 15 
+*Temperament: 15 
+*Professionalism: 15 '
 
 #scrape ratings
 ratings_list <- list()
@@ -58,12 +95,26 @@ combined_player_stats <- do.call(rbind, player_list)
 all_index <- left_join(ratings, combined_player_stats, by = c("id", "season"))
 
 #long format
-stat_average <- all_index %>%
+point_average <- all_index %>%
   filter(position.x %in% c('LW', 'C', 'RW')) %>%
-  filter(!is.na(points)) %>%
+  filter(!is.na(advancedStats.CFPctRel)) %>%
   gather(key = "stat", value = "rating", screening:professionalism) %>%
   group_by(stat, rating) %>%
-  summarise(points = mean(points)) %>%
-  spread(key = "rating", value = "points")
+  summarise(CFPct = mean(advancedStats.CFPctRel)) %>%
+  spread(key = "rating", value = "CFPct")
 
-stat_average <- stat_average[match(order, stat_average$stat), ]
+point_average <- point_average[-c(2)]
+
+point_average <- point_average[match(order, point_average$stat), ]
+point_divide <- point_average[-c(1)]
+point_divide <- mapply('/', point_divide, updateValues)
+
+testStrip = strsplit(buildString, "\n")
+for (s in testStrip){
+  print(s)
+  print('hi')
+  s = gsub(" ", "", s)
+}
+#gsub("\n", " ", buildString) 
+#testStrip = gsub("[^[:alnum:] ]", " ", testStrip) 
+#print(testStrip)
