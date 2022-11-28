@@ -59,7 +59,6 @@ pointResults <- rbind(home_df, away_df)  %>%
     net = if_else(points == 2, 1, -1),
     netWins = cumsum(net)
   )
-print(pointResults)
 
 divisions <- vector(mode = "list", length = 4)
 names(divisions) <- c("Pacific", "Central", "Atlantic", "NorthEast")
@@ -75,11 +74,14 @@ names(divisions)
 for (division in names(divisions)) {
   tempDF <-
     filter(pointResults, abbreviation %in% divisions[[division]])
+  whatyouwant <- setNames(as.character(tempDF$colors.primary), tempDF$abbreviation)
+  print(tempDF)
   print(ggplot(tempDF,
                aes(
                  x = gamesPlayed, y = netWins, group = abbreviation
                )) +
-          geom_line(aes(color = colors.primary)))
+          geom_line(aes(color = abbreviation), size = 2) +
+          scale_color_manual(values = whatyouwant))
 }
 # ggplot(pointResults,
 #        aes(x = gamesPlayed, y = netWins, color = abbreviation)) +
