@@ -1,12 +1,14 @@
 library(jsonlite)
 library(httr)
 library(tidyverse)
+library(xlsx)
+library(openxlsx)
 #0 = shl, 1 = smjhl
 league <- 0
 updateScale <- c(1, 2, 3, 4, 6, 8, 13, 18, 30, 42, 67, 97, 137, 187, 242)
 
 #i believe s60 is when the build scale changed
-seasons <- c(66:67)
+seasons <- c(66:68)
 updateValues <- c(1, 1, 2, 3, 4, 6, 8, 13, 18, 30, 42, 67, 97, 137, 187, 242)
 
 buildString = 'Offensive Ratings 
@@ -107,7 +109,6 @@ point_average <- all_index %>%
   filter(!is.na(advancedStats.CFPctRel)) %>%
   gather(key = "stat", value = "rating", screening:professionalism) %>%
   group_by(stat, rating) %>%
-<<<<<<< Updated upstream
   summarise(CFPct = mean(advancedStats.CFPctRel)) %>%
   spread(key = "rating", value = "CFPct")
 
@@ -123,27 +124,32 @@ for (s in testStrip){
   print('hi')
   s = gsub(" ", "", s)
 }
-#gsub("\n", " ", buildString) 
-#testStrip = gsub("[^[:alnum:] ]", " ", testStrip) 
-#print(testStrip)
-=======
-  summarise(points = mean(points)) %>%
-  spread(key = "rating", value = "points")
+  # summarise(points = mean(points)) %>%
+  # spread(key = "rating", value = "points")
 point_average <- point_average[-c(2)]
 point_average <- point_average[match(order, point_average$stat), ]
 
-cf_average <- all_index %>%
+cf_average_forwards <- all_index %>%
   filter(position.x %in% c('LW', 'C', 'RW')) %>%
   filter(!is.na(advancedStats.CFPctRel)) %>%
   gather(key = "stat", value = "rating", screening:professionalism) %>%
   group_by(stat, rating) %>%
   summarise(`CF%` = mean(advancedStats.CFPctRel)) %>%
   spread(key = "rating", value = "CF%")
-cf_average <- cf_average[-c(2)]
-cf_average <- cf_average[match(order, cf_average$stat), ]
+cf_average_forwards <- cf_average_forwards[-c(2)]
+cf_average_forwards <- cf_average_forwards[match(order, cf_average_forwards$stat), ]
 
-mat <- as.matrix(cf_average[-c(1)])
-print(mat)
-sweep(mat, 2, updateScale, `/`)
+cf_average_dmen <- all_index %>%
+  filter(position.x %in% c('LD', 'RD')) %>%
+  filter(!is.na(advancedStats.CFPctRel)) %>%
+  gather(key = "stat", value = "rating", screening:professionalism) %>%
+  group_by(stat, rating) %>%
+  summarise(`CF%` = mean(advancedStats.CFPctRel)) %>%
+  spread(key = "rating", value = "CF%")
+cf_average_dmen <- cf_average_dmen[-c(2)]
+cf_average_dmen <- cf_average_dmen[match(order, cf_average_dmen$stat), ]
 
->>>>>>> Stashed changes
+mat <- as.matrix(cf_average_forwards[-c(1)])
+dataset_names <- list('Dmen_CF%Rel' = cf_average_forwards, 'Fwd_CF%Rel' = cf_average_dmen)
+openxlsx::write.xlsx(dataset_names, file = 'mydata.xlsx') 
+#sweep(mat, 2, updateScale, `/`)

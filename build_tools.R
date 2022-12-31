@@ -1,3 +1,10 @@
+library(shiny)
+library(dplyr)
+library(data.table)
+library(ggplot2)
+library(shinythemes)
+
+
 stats <-
   c(
     'Goals',
@@ -24,7 +31,7 @@ time_converter <- function(Time, GP) {
   return(time)
 }
 
-calculate_min <- function(value, min_value) {
+calculate_min <- function(value, min_value, table_data) {
   if (value %in% stats) {
     table_data <- filter(table_data, value >= min_value)
     return(table_data)
@@ -133,9 +140,7 @@ createSHLData <- function(){
     team_info <- team_info[,-c(2:4, 6:18)]
     
     player_ratings <- player_ratings_combined
-    print(player_info)
     player_db <- merge(player_info, team_info, by = c("TeamId"))
-    print(player_db)
     player_db$PlayerId <- as.integer(player_db$PlayerId)
     player_stats <- player_stats_combined
     player_stats$PlayerId <- as.integer(player_stats$PlayerId)
@@ -223,9 +228,7 @@ createSHLData <- function(){
 #     team_info <- team_info[,-c(2:4, 6:18)]
 #     
 #     player_ratings <- fread('data/SHLData/player_ratings.csv')
-#     print(player_info)
 #     player_db <- merge(player_info, team_info, by = c("TeamId"))
-#     print(player_db)
 #     player_db$PlayerId <- as.integer(player_db$PlayerId)
 #     player_stats <- fread('data/SHLData/player_skater_stats_rs.csv')
 #     player_stats$PlayerId <- as.integer(player_stats$PlayerId)
@@ -303,7 +306,7 @@ createSMJHLData <- function(){
     return(smjhl_data)
   }
   else{
-    player_info <- fread('data/SMJHLData/player_master.csv')
+    player_info <- fread('data/SMJHLData/player_master.csv', quote="")
     player_info$Name <-
       paste(player_info$'First Name', player_info$'Last Name')
     
@@ -319,36 +322,16 @@ createSMJHLData <- function(){
     player_stats$PlayerId <- as.integer(player_stats$PlayerId)
     player_stats <-
       merge(player_db, player_stats, by = c("PlayerId", "TeamId"))
-    # player_stats <- player_stats %>%
-    #   group_by(PlayerId, Name, Abbr) %>%
-    #   mutate(
-    #     GP = round(mean(GP), digits = 2),
-    #     Goals = round(mean(G), digits = 2),
-    #     A = round(mean(A), digits = 2),
-    #     PIM = round(mean(PIM), digits = 2),
-    #     HIT = round(mean(HIT), digits = 2),
-    #     SB = round(mean(SB), digits = 2),
-    #     SOG = round(mean(SOG), digits = 2),
-    #     TOI = round(mean(TOI), digits = 2),
-    #     PPTOI = round(mean(PPTOI), digits = 2),
-    #     SHTOI = round(mean(SHTOI), digits = 2),
-    #     `GF/60` = round(mean(`GF/60`), digits = 2),
-    #     `GA/60` = round(mean(`GA/60`), digits = 2),
-    #     `SF/60` = round(mean(`SF/60`), digits = 2),
-    #     `SA/60` = round(mean(`SA/60`), digits = 2),
-    #     `CF% rel` = round(mean(`CF% rel`), digits = 2),
-    #     `FF% rel` = round(mean(`FF% rel`), digits = 2),
-    #   )
     
     smjhl_data <- mutate(
       player_stats,
-      Points = Goals + A,
+      Goals = G,
+      Points = G + A,
       PPG = round(mean(Points) / mean(GP), digits = 2),
       TOI = time_converter(TOI, GP),
       PPTOI = time_converter(PPTOI, GP),
       SHTOI = time_converter(SHTOI, GP)
     )
-    
     smjhl_data <- smjhl_data %>%
       summarize(
         PlayerId,
@@ -377,11 +360,9 @@ createSMJHLData <- function(){
       )
     
     smjhl_data$Points <- as.numeric(smjhl_data$Points)
-    smjhl_data$Goals <- as.numeric(smjhl_data$Goals)
+    smjhl_data$Goals <- as.numeric(smjhl_data$G)
     smjhl_data <- unique(smjhl_data)
     smjhl_data <- merge(smjhl_data, player_ratings, by = c("PlayerId"))
-    
     return(smjhl_data)
   }
-  
 }

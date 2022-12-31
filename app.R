@@ -77,13 +77,13 @@ ui <- fluidPage(
             max = 50,
             value = 30
           ),
-          textInput(
-            "min_stat",
-            label = "Minimum Stat",
-            value = ,
-            width = "100%",
-            placeholder = 0
-          ),
+          # textInput(
+          #   "min_stat",
+          #   label = "Minimum Stat",
+          #   value = ,
+          #   width = "100%",
+          #   placeholder = 0
+          # ),
           
           width =3,
         ),
@@ -124,9 +124,10 @@ server <- function(input, output) {
           filter((LD == 20) | (RD == 20))
       }
     }
-    if (input$min_stat > 0) {
-      table_data <- calculate_min(input$stat, as.double(input$min_stat))
-    }
+    # if (input$min_stat > 0) {
+    #   table_data <- filter(table_data, input$stat >= as.double(input$min_stat))
+    #   print(table_data)
+    # }
     data <-
       eval(parse(text = paste(
         "table_data$", "`", input$stat, "`", sep = ""
@@ -163,9 +164,10 @@ server <- function(input, output) {
           filter((LD == 20) | (RD == 20))
       }
     }
-    if (input$min_stat > 0) {
-      table_data <- calculate_min(input$stat, as.double(input$min_stat))
-    }
+    # if (input$min_stat > 0) {
+    #   table_data <- filter(table_data, input$stat >= as.double(input$min_stat))
+    #   print(table_data)
+    # }
     a <-
       eval(parse(text = paste(
         "table_data$", "`", input$rating, "`", sep = ""
